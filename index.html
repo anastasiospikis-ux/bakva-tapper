@@ -195,14 +195,17 @@
     <div class="score-box" id="scoreDisplay">0</div>
 
     <div class="coin-wrapper">
-        <button class="coin-btn" id="coinButton">🪙</button>
+        <button class="coin-btn" id="coinButton">BAK</button>
     </div>
 
-    <!-- Προσθήκη Κουμπιού Shop στο μενού -->
+    <!-- Πλήρες Μενού με το Shop και όλα τα κουμπιά σου -->
     <div class="menu-grid">
-        <button class="menu-btn" onclick="openShopModal()">🛒 BAKVA Shop</button>
-        <button class="menu-btn" onclick="alert('Leaderboardσε εξέλιξη')">🏆 Top</button>
-        <button class="menu-btn" onclick="alert('Tasks διαθέσιμα σύντομα')">📋 Tasks</button>
+        <button class="menu-btn" onclick="openShopModal()">🛒 Shop</button>
+        <button class="menu-btn" onclick="alert('Daily διαθέσιμο σύντομα')">🎁 Daily</button>
+        <button class="menu-btn" onclick="alert('Spin σε εξέλιξη')">🎡 Spin</button>
+        <button class="menu-btn" onclick="alert('Tap+1 ενεργό')">⚡ Tap+1</button>
+        <button class="menu-btn" onclick="alert('Bot ενεργό')">🤖 Bot</button>
+        <button class="menu-btn" onclick="alert('Top List')">🏆 Top List</button>
     </div>
 
     <!-- SHOP MODAL (Για να έχεις έσοδα / κέρδος) -->
@@ -214,7 +217,7 @@
                 <b>⚡ Super Turbo Boost (1 Ώρα)</b><br>
                 <span style="font-size: 10px; color: #f1c40f;">Διπλασιασμός πόντων σε κάθε κλικ</span>
             </div>
-            <button class="modal-btn" onclick="buyItem()">Αγορά με 1 SOL</button><br>
+            <button class="modal-btn" onclick="buyItem()">Αγορά με SOL</button><br>
             <button class="modal-btn" style="background: #e74c3c;" onclick="closeShopModal()">Κλείσιμο</button>
         </div>
     </div>
@@ -231,7 +234,7 @@
             alert("Σύνδεση με Solana Wallet για την ολοκλήρωση της αγοράς και πίστωση κέρδους...");
         }
 
-        // Παράδειγμα διαχείρισης σκορ και αποθήκευσης στο Firebase
+        // Διαχείριση σκορ και αποθήκευσης στο Firebase
         let score = 0;
         const coinBtn = document.getElementById('coinButton');
         const scoreDisplay = document.getElementById('scoreDisplay');
@@ -240,7 +243,6 @@
             score += 1;
             scoreDisplay.innerText = score;
 
-            // Παράδειγμα κλήσης αποθήκευσης στη βάση (με τυχαίο ID παίκτη επί του παρόντος)
             if (typeof window.savePlayerScore === 'function') {
                 window.savePlayerScore("player_test_user", score);
             }
