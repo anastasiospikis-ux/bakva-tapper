@@ -4,80 +4,247 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAKVA Tapper</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
         body {
-            background: linear-gradient(135deg, #1a1a1a, #2c3e50);
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
             margin: 0;
             padding: 0;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
             height: 100vh;
             overflow: hidden;
         }
-        h1 {
-            margin-bottom: 5px;
-            color: #f1c40f;
+        .header {
+            text-align: center;
+            margin-top: 20px;
         }
-        #score {
-            font-size: 48px;
+        .score {
+            font-size: 42px;
             font-weight: bold;
-            margin: 20px 0;
-            text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+            color: #f3ba2f;
+            margin-top: 10px;
         }
-        .tap-button {
-            background: #f1c40f;
-            border: none;
+        .coin-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        .coin {
+            width: 200px;
+            height: 200px;
+            background: #f3ba2f;
             border-radius: 50%;
-            width: 180px;
-            height: 180px;
-            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
             font-weight: bold;
             color: #1a1a1a;
+            box-shadow: 0 0 30px rgba(243, 186, 47, 0.5);
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            transition: transform 0.1s, background 0.2s;
-            outline: none;
-            user-select: none;
+            transition: transform 0.1s ease;
         }
-        .tap-button:active {
+        .coin:active {
             transform: scale(0.92);
-            background: #d4ac0d;
+        }
+        .footer-panel {
+            width: 100%;
+            padding: 20px;
+            background: #252525;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .energy-bar-container {
+            width: 100%;
+            background: #333;
+            border-radius: 10px;
+            height: 15px;
+            overflow: hidden;
+        }
+        .energy-bar {
+            width: 100%;
+            height: 100%;
+            background: #4cd137;
+            transition: width 0.2s linear;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .shop-btn {
+            background: #f3ba2f;
+            color: #1a1a1a;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        /* Modal Καταστήματος */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #252525;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+        .upgrade-item {
+            background: #333;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .upgrade-item button {
+            background: #f3ba2f;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal {
+            margin-top: 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <h1>BAKVA Tapper</h1>
-    <p>Πάτα για να μαζέψεις πόντους!</p>
-    
-    <div id="score">0</div>
-    
-    <button class="tap-button" id="tapBtn">TAP!</button>
+    <div class="header">
+        <div>BAKVA Tapper</div>
+        <div class="score" id="score">0 BAK</div>
+    </div>
+
+    <div class="coin-container">
+        <div class="coin" id="tap-btn">BAK</div>
+    </div>
+
+    <div class="footer-panel">
+        <div class="stats">
+            <span>⚡ Ενέργεια: <span id="energy">1000</span>/1000</span>
+            <span>🚀 Boost: +<span id="power">1</span> BAK/tap</span>
+        </div>
+        <div class="energy-bar-container">
+            <div class="energy-bar" id="energy-bar"></div>
+        </div>
+        <button class="shop-btn" id="open-shop">🛒 Κατάστημα Upgrades</button>
+    </div>
+
+    <!-- Παράθυρο Αναβαθμίσεων -->
+    <div class="modal" id="shop-modal">
+        <div class="modal-content">
+            <h3>Κατάστημα</h3>
+            <div class="upgrade-item">
+                <div style="text-align: left;">
+                    <div><b>+1 BAK ανά Tap</b></div>
+                    <small>Κόστος: <span id="upgrade-cost">100</span> BAK</small>
+                </div>
+                <button id="buy-upgrade">Αγορά</button>
+            </div>
+            <button class="close-modal" id="close-shop">Κλείσιμο</button>
+        </div>
+    </div>
 
     <script>
-        let score = 0;
-        const scoreDisplay = document.getElementById('score');
-        const tapBtn = document.getElementById('tapBtn');
+        let score = parseInt(localStorage.getItem('bak_score')) || 0;
+        let energy = parseInt(localStorage.getItem('bak_energy')) || 1000;
+        let maxEnergy = 1000;
+        let power = parseInt(localStorage.getItem('bak_power')) || 1;
+        let upgradeCost = parseInt(localStorage.getItem('bak_cost')) || 100;
 
-        // Initialize Telegram Web App
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+        const scoreEl = document.getElementById('score');
+        const energyEl = document.getElementById('energy');
+        const energyBar = document.getElementById('energy-bar');
+        const powerEl = document.getElementById('power');
+        const tapBtn = document.getElementById('tap-btn');
+        const shopModal = document.getElementById('shop-modal');
+        const openShopBtn = document.getElementById('open-shop');
+        const closeShopBtn = document.getElementById('close-shop');
+        const buyUpgradeBtn = document.getElementById('buy-upgrade');
+        const upgradeCostEl = document.getElementById('upgrade-cost');
 
-        tapBtn.addEventListener('click', () => {
-            score++;
-            scoreDisplay.innerText = score;
-            
-            // Δόνηση ανυπομονησίας/αφής (εφόσον υποστηρίζεται από το κινητό)
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
+        function updateUI() {
+            scoreEl.innerText = score + " BAK";
+            energyEl.innerText = energy;
+            powerEl.innerText = power;
+            upgradeCostEl.innerText = upgradeCost;
+            energyBar.style.width = (energy / maxEnergy) * 100 + "%";
+
+            localStorage.setItem('bak_score', score);
+            localStorage.setItem('bak_energy', energy);
+            localStorage.setItem('bak_power', power);
+            localStorage.setItem('bak_cost', upgradeCost);
+        }
+
+        tapBtn.addEventListener('click', (e) => {
+            if (energy >= power) {
+                score += power;
+                energy -= power;
+                updateUI();
             }
         });
+
+        // Αναπλήρωση ενέργειας με τον χρόνο
+        setInterval(() => {
+            if (energy < maxEnergy) {
+                energy = Math.min(maxEnergy, energy + 3);
+                updateUI();
+            }
+        }, 1000);
+
+        openShopBtn.addEventListener('click', () => {
+            shopModal.style.display = 'flex';
+        });
+
+        closeShopBtn.addEventListener('click', () => {
+            shopModal.style.display = 'none';
+        });
+
+        buyUpgradeBtn.addEventListener('click', () => {
+            if (score >= upgradeCost) {
+                score -= upgradeCost;
+                power += 1;
+                upgradeCost = Math.floor(upgradeCost * 1.5);
+                updateUI();
+            } else {
+                alert("Δεν έχεις αρκετά BAK!");
+            }
+        });
+
+        updateUI();
     </script>
 </body>
 </html>
