@@ -2,247 +2,276 @@
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAKVA Tapper</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BAKVA Runner - Community Rewards Edition</title>
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
+        * { box-sizing: border-box; user-select: none; }
+        body { margin: 0; background: #121212; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
+        
+        .header { text-align: center; padding: 8px; display: flex; gap: 8px; font-weight: bold; font-size: 13px; flex-wrap: wrap; justify-content: center; }
+        
+        .game-area { position: relative; width: 100%; height: 260px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; border-bottom: 2px solid #FFC107; background: linear-gradient(to bottom, #1a1a1a, #262626); }
+
+        .bakva-boy { 
+            width: 60px; height: 60px; background: #FFC107; border-radius: 15px; 
+            position: absolute; bottom: 20px; transition: transform 0.1s; display: flex; 
+            justify-content: center; align-items: center; font-size: 30px; z-index: 10; 
         }
-        body {
-            margin: 0;
-            padding: 0;
-            background: #1a1a1a;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            height: 100vh;
-            overflow: hidden;
+        
+        .bakva-boy.shielded {
+            box-shadow: 0 0 20px 5px #00FFFF;
+            border: 3px solid #00FFFF;
         }
-        .header {
-            text-align: center;
-            margin-top: 20px;
+
+        /* QUEEN BEE BOSS */
+        .queen-bee {
+            position: absolute; top: 15px; width: 90px; height: 90px;
+            background: #FFD700; border-radius: 50%; display: none;
+            justify-content: center; align-items: center; font-size: 45px;
+            box-shadow: 0 0 30px #FF9800; z-index: 20; cursor: pointer;
+            animation: float 2s infinite ease-in-out;
         }
-        .score {
-            font-size: 42px;
-            font-weight: bold;
-            color: #f3ba2f;
-            margin-top: 10px;
+        
+        .stinger {
+            position: absolute; width: 12px; height: 22px; background: #FF5722;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%); display: none; z-index: 15;
         }
-        .coin-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-        .coin {
-            width: 200px;
-            height: 200px;
-            background: #f3ba2f;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            color: #1a1a1a;
-            box-shadow: 0 0 30px rgba(243, 186, 47, 0.5);
-            cursor: pointer;
-            transition: transform 0.1s ease;
-        }
-        .coin:active {
-            transform: scale(0.92);
-        }
-        .footer-panel {
-            width: 100%;
-            padding: 20px;
-            background: #252525;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .energy-bar-container {
-            width: 100%;
-            background: #333;
-            border-radius: 10px;
-            height: 15px;
-            overflow: hidden;
-        }
-        .energy-bar {
-            width: 100%;
-            height: 100%;
-            background: #4cd137;
-            transition: width 0.2s linear;
-        }
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #aaa;
-        }
-        .shop-btn {
-            background: #f3ba2f;
-            color: #1a1a1a;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-        }
-        /* Modal Καταστήματος */
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .boss-bar-container { width: 80%; height: 16px; background: #333; margin: 3px; display: none; border-radius: 8px; overflow: hidden; }
+        .boss-bar { width: 100%; height: 100%; background: #F44336; transition: width 0.3s; }
+
+        .controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 95%; margin-top: 15px; }
+        .btn { background: #333; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-jump { background: #4CAF50; }
+        .btn-run { background: #E91E63; }
+        .btn-rewards { background: #9945FF; color: white; }
+        
+        .jumping { animation: jump 0.4s ease; }
+        @keyframes jump { 0% { bottom: 20px; } 50% { bottom: 110px; } 100% { bottom: 20px; } }
+
+        /* Modals */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-content {
-            background: #252525;
-            padding: 20px;
-            border-radius: 15px;
-            width: 80%;
-            max-width: 300px;
-            text-align: center;
+            background-color: #1e1e1e; padding: 20px; border-radius: 20px; width: 90%; max-width: 360px; text-align: center;
+            max-height: 90vh; overflow-y: auto;
         }
-        .upgrade-item {
-            background: #333;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .upgrade-item button {
-            background: #f3ba2f;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-modal {
-            margin-top: 15px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+        .input-wallet { width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: white; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div>BAKVA Tapper</div>
-        <div class="score" id="score">0 BAK</div>
+        <div id="score">0 BAK</div>
+        <div id="distance-display">📍 0m</div>
+        <div id="lives-display" style="color: #F44336;">❤️ Lives: 3/3</div>
+        <div id="shield-display" style="color: #00FFFF; display: none;">🛡️ Shield: 10/10</div>
+        <div id="honey-display" style="color: #FF9800;">🍯 0 Honey</div>
     </div>
 
-    <div class="coin-container">
-        <div class="coin" id="tap-btn">BAK</div>
+    <div class="boss-bar-container" id="boss-container">
+        <div class="boss-bar" id="boss-bar"></div>
     </div>
 
-    <div class="footer-panel">
-        <div class="stats">
-            <span>⚡ Ενέργεια: <span id="energy">1000</span>/1000</span>
-            <span>🚀 Boost: +<span id="power">1</span> BAK/tap</span>
-        </div>
-        <div class="energy-bar-container">
-            <div class="energy-bar" id="energy-bar"></div>
-        </div>
-        <button class="shop-btn" id="open-shop">🛒 Κατάστημα Upgrades</button>
+    <div class="game-area" id="game-area">
+        <div class="bakva-boy" id="bakva-boy">🏃</div>
+        <div class="queen-bee" id="queen-bee" onclick="attackBoss()">👑🐝</div>
+        <div class="stinger" id="stinger"></div>
     </div>
 
-    <!-- Παράθυρο Αναβαθμίσεων -->
-    <div class="modal" id="shop-modal">
+    <div class="controls">
+        <button class="btn" onclick="move(-40)">⬅️</button>
+        <button class="btn btn-jump" onclick="jump()">🚀 JUMP</button>
+        <button class="btn" onclick="move(40)">➡️</button>
+        <button class="btn btn-run" id="run-btn" onclick="toggleRun()">RUN</button>
+        <button class="btn btn-rewards" onclick="openRewards()">🎁 CLAIM BAK</button>
+    </div>
+
+    <!-- Rewards & Claim Modal -->
+    <div class="modal" id="rewards-modal">
         <div class="modal-content">
-            <h3>Κατάστημα</h3>
-            <div class="upgrade-item">
-                <div style="text-align: left;">
-                    <div><b>+1 BAK ανά Tap</b></div>
-                    <small>Κόστος: <span id="upgrade-cost">100</span> BAK</small>
-                </div>
-                <button id="buy-upgrade">Αγορά</button>
-            </div>
-            <button class="close-modal" id="close-shop">Κλείσιμο</button>
+            <h3 style="color: #9945FF;">🎁 BAKVA Community Rewards</h3>
+            <p style="font-size: 12px; color: #ccc;">Στείλε το σκορ σου και τη διεύθυνσή σου στο Solana για να διεκδικήσεις πραγματικά BAK από το reward pool!</p>
+            
+            <input type="text" id="wallet-input" class="input-wallet" placeholder="Επικόλληση Solana Wallet (Phantom κλπ)">
+            
+            <button class="btn btn-jump" style="width:100%; margin-top:15px;" onclick="submitClaim()">Υποβολή Claim</button>
+            <button class="btn" style="background:#444; margin-top:10px; width:100%;" onclick="closeRewards()">Κλείσιμο</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal" id="gameover-modal">
+        <div class="modal-content">
+            <h2 style="color: #F44336;">GAME OVER</h2>
+            <p id="final-stats">Τελική Απόσταση: 0m</p>
+            <button class="btn btn-jump" style="width:100%; margin-top:15px;" onclick="restartGame()">🔄 Παίξε Ξανά</button>
         </div>
     </div>
 
     <script>
-        let score = parseInt(localStorage.getItem('bak_score')) || 0;
-        let energy = parseInt(localStorage.getItem('bak_energy')) || 1000;
-        let maxEnergy = 1000;
-        let power = parseInt(localStorage.getItem('bak_power')) || 1;
-        let upgradeCost = parseInt(localStorage.getItem('bak_cost')) || 100;
+        let gameState = { 
+            score: 0, 
+            distance: 0, 
+            pos: 0, 
+            isRunning: false, 
+            bossHP: 100,
+            hasShield: false,
+            shieldHits: 0,
+            honey: 1,
+            lives: 3,
+            gameActive: true
+        };
 
-        const scoreEl = document.getElementById('score');
-        const energyEl = document.getElementById('energy');
-        const energyBar = document.getElementById('energy-bar');
-        const powerEl = document.getElementById('power');
-        const tapBtn = document.getElementById('tap-btn');
-        const shopModal = document.getElementById('shop-modal');
-        const openShopBtn = document.getElementById('open-shop');
-        const closeShopBtn = document.getElementById('close-shop');
-        const buyUpgradeBtn = document.getElementById('buy-upgrade');
-        const upgradeCostEl = document.getElementById('upgrade-cost');
+        const boy = document.getElementById('bakva-boy');
+        const queen = document.getElementById('queen-bee');
+        const stinger = document.getElementById('stinger');
+        const bossBar = document.getElementById('boss-bar');
+        const bossCont = document.getElementById('boss-container');
+        const shieldDisplay = document.getElementById('shield-display');
+        const livesDisplay = document.getElementById('lives-display');
+        const honeyDisplay = document.getElementById('honey-display');
+        const scoreDisplay = document.getElementById('score');
+        const distanceDisplay = document.getElementById('distance-display');
 
-        function updateUI() {
-            scoreEl.innerText = score + " BAK";
-            energyEl.innerText = energy;
-            powerEl.innerText = power;
-            upgradeCostEl.innerText = upgradeCost;
-            energyBar.style.width = (energy / maxEnergy) * 100 + "%";
-
-            localStorage.setItem('bak_score', score);
-            localStorage.setItem('bak_energy', energy);
-            localStorage.setItem('bak_power', power);
-            localStorage.setItem('bak_cost', upgradeCost);
+        function move(val) { 
+            if (!gameState.gameActive) return;
+            gameState.pos = Math.max(-100, Math.min(100, gameState.pos + val)); 
+            boy.style.transform = `translateX(${gameState.pos}px)`; 
         }
 
-        tapBtn.addEventListener('click', (e) => {
-            if (energy >= power) {
-                score += power;
-                energy -= power;
-                updateUI();
-            }
-        });
+        function jump() { 
+            if (!gameState.gameActive) return;
+            boy.classList.add('jumping'); 
+            setTimeout(() => boy.classList.remove('jumping'), 400); 
+        }
 
-        // Αναπλήρωση ενέργειας με τον χρόνο
+        function toggleRun() { 
+            if (!gameState.gameActive) return;
+            gameState.isRunning = !gameState.isRunning; 
+            document.getElementById('run-btn').innerText = gameState.isRunning ? "RUNNING" : "RUN"; 
+        }
+
+        function openRewards() { document.getElementById('rewards-modal').style.display = 'flex'; }
+        function closeRewards() { document.getElementById('rewards-modal').style.display = 'none'; }
+
+        function submitClaim() {
+            let wallet = document.getElementById('wallet-input').value.trim();
+            if (wallet.length < 30) {
+                alert("Παρακαλώ εισάγετε μια έγκυρη διεύθυνση Solana!");
+                return;
+            }
+            alert(`Επιτυχής καταχώρηση!\nΣκορ: ${Math.floor(gameState.score).toLocaleString()} BAK\nWallet: ${wallet}\n\nΘα ελεγχθεί για την αποστολή των BAK!`);
+            closeRewards();
+        }
+
+        function updateUI() {
+            scoreDisplay.innerText = Math.floor(gameState.score).toLocaleString() + " BAK";
+            distanceDisplay.innerText = `📍 ${gameState.distance}m`;
+            livesDisplay.innerText = `❤️ Lives: ${gameState.lives}/3`;
+            honeyDisplay.innerText = `🍯 ${gameState.honey} Honey`;
+        }
+
+        function attackBoss() {
+            if (!gameState.gameActive) return;
+            gameState.bossHP -= 20;
+            bossBar.style.width = gameState.bossHP + "%";
+            if (gameState.bossHP <= 0) {
+                gameState.score += 50000; 
+                queen.style.display = 'none';
+                bossCont.style.display = 'none';
+                stinger.style.display = 'none';
+                gameState.bossHP = 100;
+                alert("Νίκησες τη Βασίλισσα! +50.000 BAK Bonus στο σκορ σου!");
+            }
+        }
+
+        function shootStinger() {
+            if (!gameState.gameActive) return;
+            if (queen.style.display === 'flex') {
+                stinger.style.display = 'block';
+                let stingerBottom = 200;
+                let stingerLeft = window.innerWidth / 2 + gameState.pos;
+                stinger.style.left = stingerLeft + 'px';
+
+                let fallInterval = setInterval(() => {
+                    if (!gameState.gameActive) { clearInterval(fallInterval); return; }
+                    stingerBottom -= 15;
+                    stinger.style.bottom = stingerBottom + 'px';
+
+                    if (stingerBottom <= 30) {
+                        clearInterval(fallInterval);
+                        stinger.style.display = 'none';
+
+                        let isJumping = boy.classList.contains('jumping');
+
+                        if (!isJumping) {
+                            if (gameState.hasShield) {
+                                gameState.shieldHits--;
+                                shieldDisplay.innerText = `🛡️ Shield: ${gameState.shieldHits}/10`;
+                                if (gameState.shieldHits <= 0) {
+                                    gameState.hasShield = false;
+                                    boy.classList.remove('shielded');
+                                    shieldDisplay.style.display = 'none';
+                                }
+                            } else if (gameState.honey > 0) {
+                                gameState.honey--;
+                                alert("Χρησιμοποιήθηκε 1 μέλι για να σωθείς!");
+                            } else {
+                                gameState.lives--;
+                                if (gameState.lives <= 0) {
+                                    triggerGameOver();
+                                }
+                            }
+                            updateUI();
+                        }
+                    }
+                }, 40);
+            }
+        }
+
+        function triggerGameOver() {
+            gameState.gameActive = false;
+            document.getElementById('final-stats').innerText = `Τελική Απόσταση: ${gameState.distance}m\nΣκορ: ${Math.floor(gameState.score).toLocaleString()} BAK`;
+            document.getElementById('gameover-modal').style.display = 'flex';
+        }
+
+        function restartGame() {
+            gameState.score = 0;
+            gameState.distance = 0;
+            gameState.lives = 3;
+            gameState.hasShield = false;
+            gameState.honey = 1;
+            gameState.gameActive = true;
+            document.getElementById('gameover-modal').style.display = 'none';
+            queen.style.display = 'none';
+            bossCont.style.display = 'none';
+            updateUI();
+        }
+
+        // Κεντρικό Game Loop
         setInterval(() => {
-            if (energy < maxEnergy) {
-                energy = Math.min(maxEnergy, energy + 3);
-                updateUI();
+            if (!gameState.gameActive) return;
+            let gain = gameState.isRunning ? 200 : 100; 
+            gameState.score += gain;
+            gameState.distance += 1;
+            updateUI();
+
+            if (gameState.distance % 100 === 0 && queen.style.display !== 'flex') {
+                queen.style.display = 'flex';
+                bossCont.style.display = 'block';
             }
-        }, 1000);
+        }, 400);
 
-        openShopBtn.addEventListener('click', () => {
-            shopModal.style.display = 'flex';
-        });
-
-        closeShopBtn.addEventListener('click', () => {
-            shopModal.style.display = 'none';
-        });
-
-        buyUpgradeBtn.addEventListener('click', () => {
-            if (score >= upgradeCost) {
-                score -= upgradeCost;
-                power += 1;
-                upgradeCost = Math.floor(upgradeCost * 1.5);
-                updateUI();
-            } else {
-                alert("Δεν έχεις αρκετά BAK!");
+        setInterval(() => {
+            if (gameState.gameActive && queen.style.display === 'flex') {
+                shootStinger();
             }
-        });
+        }, 2500);
 
         updateUI();
     </script>
