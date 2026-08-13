@@ -23,7 +23,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Συνάρτηση αποθήκευσης σκορ στη βάση δεδομένων
         window.savePlayerScore = function(userId, score) {
             set(ref(db, 'players/' + userId), {
                 score: score,
@@ -118,7 +117,7 @@
         .menu-btn {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255,255,255,0.15);
-            padding: 6px 4px;
+            padding: 4px 2px;
             border-radius: 6px;
             color: white;
             font-size: 9px;
@@ -186,7 +185,16 @@
 </head>
 <body>
 
-    <!-- Κεντρικό Interface -->
+    <!-- TUTORIAL MODAL -->
+    <div id="tutorialModal" class="modal-overlay" style="display: flex;">
+        <div class="modal-box">
+            <h3>👑 Καλώς ήρθατε</h3>
+            <p>Μαζέψτε πόντους και χτίστε την αυτοκρατορία σας!</p>
+            <button class="modal-btn" onclick="document.getElementById('tutorialModal').style.display='none'">Συνέχεια</button>
+        </div>
+    </div>
+
+    <!-- Header & Score -->
     <div class="header">
         <span class="rank-badge">🏆 BAKVA Empire</span>
         <span style="font-size: 10px; color: #2ecc71;">Online</span>
@@ -198,24 +206,24 @@
         <button class="coin-btn" id="coinButton">BAK</button>
     </div>
 
-    <!-- Πλήρες Μενού με το Shop και όλα τα κουμπιά σου -->
+    <!-- Μενού με το κουμπί Shop -->
     <div class="menu-grid">
         <button class="menu-btn" onclick="openShopModal()">🛒 Shop</button>
-        <button class="menu-btn" onclick="alert('Daily διαθέσιμο σύντομα')">🎁 Daily</button>
-        <button class="menu-btn" onclick="alert('Spin σε εξέλιξη')">🎡 Spin</button>
-        <button class="menu-btn" onclick="alert('Tap+1 ενεργό')">⚡ Tap+1</button>
-        <button class="menu-btn" onclick="alert('Bot ενεργό')">🤖 Bot</button>
-        <button class="menu-btn" onclick="alert('Top List')">🏆 Top List</button>
+        <button class="menu-btn" onclick="alert('Daily')">🎁 Daily</button>
+        <button class="menu-btn" onclick="alert('Spin')">🎡 Spin</button>
+        <button class="menu-btn" onclick="alert('Tap+1')">⚡ Tap+1</button>
+        <button class="menu-btn" onclick="alert('Bot')">🤖 Bot</button>
+        <button class="menu-btn" onclick="alert('Top')">🏆 Top</button>
     </div>
 
-    <!-- SHOP MODAL (Για να έχεις έσοδα / κέρδος) -->
+    <!-- SHOP MODAL -->
     <div id="shopModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>🛒 BAKVA Store</h3>
-            <p>Απόκτησε προνόμια και ενίσχυσε την παραγωγή σου στο παιχνίδι!</p>
+            <p>Αποκτήστε προνόμια και ενισχύσεις!</p>
             <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin: 8px 0;">
-                <b>⚡ Super Turbo Boost (1 Ώρα)</b><br>
-                <span style="font-size: 10px; color: #f1c40f;">Διπλασιασμός πόντων σε κάθε κλικ</span>
+                <b>⚡ Super Turbo Boost</b><br>
+                <span style="font-size: 10px; color: #f1c40f;">Διπλασιασμός κλικ</span>
             </div>
             <button class="modal-btn" onclick="buyItem()">Αγορά με SOL</button><br>
             <button class="modal-btn" style="background: #e74c3c;" onclick="closeShopModal()">Κλείσιμο</button>
@@ -223,7 +231,10 @@
     </div>
 
     <script>
-        // Λογική ανοίγματος/κλεισίματος Shop
+        // Η διεύθυνση Solana σου για τα έσοδα
+        const OWNER_SOL_WALLET = "CiWjs9UYMhqwgN5CD9qKSGHK36aZPwy5ssJ1QorzxTM4";
+
+        // Λειτουργίες Shop
         function openShopModal() {
             document.getElementById('shopModalOverlay').style.display = 'flex';
         }
@@ -231,10 +242,19 @@
             document.getElementById('shopModalOverlay').style.display = 'none';
         }
         function buyItem() {
-            alert("Σύνδεση με Solana Wallet για την ολοκλήρωση της αγοράς και πίστωση κέρδους...");
+            // Δημιουργία συνδέσμου πληρωμής Solana για το πορτοφόλι σου
+            const solanaPayUrl = `solana:${OWNER_SOL_WALLET}?amount=0.1&label=BAKVA%20Empire%20Boost&message=Super%20Turbo%20Boost`;
+            
+            // Προσπάθεια άνοιξης του πορτοφολιού (Phantom κλπ)
+            window.location.href = solanaPayUrl;
+            
+            // Ενημέρωση σε περίπτωση που δεν ανοίξει αυτόματα εφαρμογή πορτοφολιού
+            setTimeout(() => {
+                alert("Διεύθυνση λήψης SOL:\n" + OWNER_SOL_WALLET);
+            }, 500);
         }
 
-        // Διαχείριση σκορ και αποθήκευσης στο Firebase
+        // Λογική κλικ και Firebase
         let score = 0;
         const coinBtn = document.getElementById('coinButton');
         const scoreDisplay = document.getElementById('scoreDisplay');
