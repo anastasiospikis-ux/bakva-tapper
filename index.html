@@ -4,6 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAKVA Empire - Ultimate Pro Edition</title>
+    
+    <!-- Firebase SDKs & Database Config -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCNHrY94rLwJ0bq_WHkF8...",
+          authDomain: "bakva-game.firebaseapp.com",
+          projectId: "bakva-game",
+          storageBucket: "bakva-game.appspot.com",
+          messagingSenderId: "645831669827",
+          appId: "1:645831669827:web:140b053b...",
+          measurementId: "G-EP0VCGZMPJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Συνάρτηση αποθήκευσης σκορ στη βάση δεδομένων
+        window.savePlayerScore = function(userId, score) {
+            set(ref(db, 'players/' + userId), {
+                score: score,
+                lastUpdated: Date.now()
+            });
+        };
+    </script>
+
     <style>
         * { box-sizing: border-box; user-select: none; }
         body {
@@ -90,7 +118,7 @@
         .menu-btn {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255,255,255,0.15);
-            padding: 4px 2px;
+            padding: 6px 4px;
             border-radius: 6px;
             color: white;
             font-size: 9px;
@@ -139,7 +167,7 @@
         /* Modal Styles */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); display: flex;
+            background: rgba(0, 0, 0, 0.85); display: none;
             align-items: center; justify-content: center; z-index: 1000;
         }
         .modal-box {
@@ -158,307 +186,65 @@
 </head>
 <body>
 
-    <!-- TUTORIAL MODAL -->
-    <div class="modal-overlay" id="tutorialModal">
-        <div class="modal-box">
-            <h3>📖 Καλώς ήρθατε στο BAKVA!</h3>
-            <p>
-                1️⃣ <b>Tap & Earn:</b> Πατήστε το κεντρικό κουμπί για πόντους.<br><br>
-                2️⃣ <b>Lucky Spin:</b> Γυρίστε τον τροχό καθημερινά για τεράστια μπόνους Units!<br><br>
-                3️⃣ <b>Auto-Bots & Energy:</b> Αγοράστε bots και αναβαθμίστε την ενέργειά σας.<br><br>
-                4️⃣ <b>Airdrop:</b> Οι πόντοι σας μεταφραζονται σε tokens στο launch!
-            </p>
-            <button class="modal-btn" onclick="closeTutorial()">Ξεκινήστε! 🚀</button>
-        </div>
+    <!-- Κεντρικό Interface -->
+    <div class="header">
+        <span class="rank-badge">🏆 BAKVA Empire</span>
+        <span style="font-size: 10px; color: #2ecc71;">Online</span>
     </div>
 
-    <!-- DEV VAULT AUDIT MODAL -->
-    <div class="modal-overlay" id="devModal" style="display: none;">
-        <div class="modal-box" style="border-color: #b91d47;">
-            <h3 style="color: #f87171;">🛠️ Developer Vault Audit</h3>
-            <p>
-                <b>Protected Reserve:</b> <span id="devVaultVal">0</span> Units<br>
-                <b>Game Balance Control:</b> 100% Secure<br>
-                <b>Tax Collection Status:</b> Active<br><br>
-                <i>💡 Tip: Αυτό το μενού ανοίγει με τριπλό κλικ στον επάνω τίτλο.</i>
-            </p>
-            <button class="modal-btn" style="background: #b91d47;" onclick="closeDevModal()">Κλείσιμο διαχειριστικού</button>
-        </div>
+    <div class="score-box" id="scoreDisplay">0</div>
+
+    <div class="coin-wrapper">
+        <button class="coin-btn" id="coinButton">🪙</button>
     </div>
 
-    <!-- LUCKY SPIN MODAL -->
-    <div class="modal-overlay" id="spinModal" style="display: none;">
-        <div class="modal-box" style="border-color: #3b82f6; text-align: center;">
-            <h3 style="color: #60a5fa;">🎡 Lucky Spin Wheel</h3>
-            <p style="text-align: center;">Δοκιμάστε την τύχη σας! Κερδίστε δωρεάν Units καθημερινά.</p>
-            <div id="spinResultBox" style="font-size: 16px; font-weight: bold; color: #f1c40f; margin: 15px 0;">🎁 Έτοιμος για περιστροφή;</div>
-            <button class="modal-btn" id="spinActionBtn" style="background: #2563eb;" onclick="startSpin()">Γύρισε τον Τροχό! 🎯</button>
-            <br>
-            <button class="modal-btn" style="background: #475569; margin-top: 6px;" onclick="closeSpinModal()">Κλείσιμο</button>
-        </div>
-    </div>
-
-    <div class="header" onclick="checkDevTrigger()">
-        <div>👑 <b>BAKVA</b> Empire</div>
-        <div class="rank-badge" id="rankBadge">Rank: Rookie 🥉</div>
-    </div>
-
-    <div class="owner-vault">
-        <span>🛡️ Owner Vault:</span>
-        <span id="ownerScore" style="color: #fca5a5;">0 Units</span>
-    </div>
-
-    <div>
-        <div style="font-size: 8px; color: #aaa; text-transform: uppercase;">Πόντοι Παίκτη</div>
-        <div class="score-box" id="score">0</div>
-        <div class="passive-income" id="passiveText">🤖 Auto-Mining: 0/sec</div>
-    </div>
-
-    <div class="coin-wrapper" id="coinWrapper">
-        <button class="coin-btn" id="coinBtn" onclick="tapCoin(event)">BAK</button>
-    </div>
-
+    <!-- Προσθήκη Κουμπιού Shop στο μενού -->
     <div class="menu-grid">
-        <button class="menu-btn" onclick="claimDaily()">🎁 Daily</button>
-        <button class="menu-btn" onclick="openSpinModal()">🎡 Spin</button>
-        <button class="menu-btn" onclick="buyBooster()">⚡ Tap+1</button>
-        <button class="menu-btn" onclick="buyMiner()">🤖 Bot</button>
-        <button class="menu-btn" onclick="showLeaderboard()">🏆 Top List</button>
-        <button class="menu-btn" onclick="inviteFriend()">👥 Invite</button>
+        <button class="menu-btn" onclick="openShopModal()">🛒 BAKVA Shop</button>
+        <button class="menu-btn" onclick="alert('Leaderboardσε εξέλιξη')">🏆 Top</button>
+        <button class="menu-btn" onclick="alert('Tasks διαθέσιμα σύντομα')">📋 Tasks</button>
     </div>
 
-    <div class="panel">
-        <div class="energy-info">
-            <span>⚡ Ενέργεια</span>
-            <span><span id="energyText">500</span> / <span id="maxEnergyText">500</span></span>
+    <!-- SHOP MODAL (Για να έχεις έσοδα / κέρδος) -->
+    <div id="shopModalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🛒 BAKVA Store</h3>
+            <p>Απόκτησε προνόμια και ενίσχυσε την παραγωγή σου στο παιχνίδι!</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin: 8px 0;">
+                <b>⚡ Super Turbo Boost (1 Ώρα)</b><br>
+                <span style="font-size: 10px; color: #f1c40f;">Διπλασιασμός πόντων σε κάθε κλικ</span>
+            </div>
+            <button class="modal-btn" onclick="buyItem()">Αγορά με 1 SOL</button><br>
+            <button class="modal-btn" style="background: #e74c3c;" onclick="closeShopModal()">Κλείσιμο</button>
         </div>
-        <div class="energy-bar-container">
-            <div class="energy-bar" id="energyBar"></div>
-        </div>
-        <button class="tg-btn" onclick="openTelegram()">📢 Join Community & Claim Airdrop</button>
     </div>
 
     <script>
-        const scoreEl = document.getElementById('score');
-        const ownerScoreEl = document.getElementById('ownerScore');
-        const energyBarEl = document.getElementById('energyBar');
-        const energyTextEl = document.getElementById('energyText');
-        const maxEnergyTextEl = document.getElementById('maxEnergyText');
-        const rankBadgeEl = document.getElementById('rankBadge');
-        const coinWrapper = document.getElementById('coinWrapper');
-        const passiveTextEl = document.getElementById('passiveText');
-        const tutorialModal = document.getElementById('tutorialModal');
-        const devModal = document.getElementById('devModal');
-        const spinModal = document.getElementById('spinModal');
-        const devVaultVal = document.getElementById('devVaultVal');
-        const spinResultBox = document.getElementById('spinResultBox');
-        const spinActionBtn = document.getElementById('spinActionBtn');
-
-        let score = parseInt(localStorage.getItem('bakva_safe_score')) || 0;
-        let ownerVault = parseInt(localStorage.getItem('bakva_safe_vault')) || 0;
-        let energy = parseInt(localStorage.getItem('bakva_safe_energy')) || 500;
-        let maxEnergy = parseInt(localStorage.getItem('bakva_safe_max_energy')) || 500;
-        let tapPower = parseInt(localStorage.getItem('bakva_safe_power')) || 1;
-        let autoMiner = parseInt(localStorage.getItem('bakva_safe_miner')) || 0;
-        let hasSeenTutorial = localStorage.getItem('bakva_safe_tutorial') === 'true';
-
-        let clickCounter = 0;
-        let lastClickTime = 0;
-
-        if (hasSeenTutorial) {
-            tutorialModal.style.display = 'none';
+        // Λογική ανοίγματος/κλεισίματος Shop
+        function openShopModal() {
+            document.getElementById('shopModalOverlay').style.display = 'flex';
+        }
+        function closeShopModal() {
+            document.getElementById('shopModalOverlay').style.display = 'none';
+        }
+        function buyItem() {
+            alert("Σύνδεση με Solana Wallet για την ολοκλήρωση της αγοράς και πίστωση κέρδους...");
         }
 
-        updateUI();
+        // Παράδειγμα διαχείρισης σκορ και αποθήκευσης στο Firebase
+        let score = 0;
+        const coinBtn = document.getElementById('coinButton');
+        const scoreDisplay = document.getElementById('scoreDisplay');
 
-        setInterval(() => {
-            if (energy < maxEnergy) {
-                energy = Math.min(maxEnergy, energy + 5);
+        coinBtn.addEventListener('click', () => {
+            score += 1;
+            scoreDisplay.innerText = score;
+
+            // Παράδειγμα κλήσης αποθήκευσης στη βάση (με τυχαίο ID παίκτη επί του παρόντος)
+            if (typeof window.savePlayerScore === 'function') {
+                window.savePlayerScore("player_test_user", score);
             }
-            if (autoMiner > 0) {
-                let passiveGain = autoMiner;
-                score += passiveGain;
-                ownerVault += Math.ceil(passiveGain * 0.4);
-                saveData();
-            }
-            updateUI();
-        }, 1000);
-
-        function closeTutorial() {
-            tutorialModal.style.display = 'none';
-            localStorage.setItem('bakva_safe_tutorial', 'true');
-        }
-
-        function checkDevTrigger() {
-            let now = new Date().getTime();
-            if (now - lastClickTime < 400) {
-                clickCounter++;
-                if (clickCounter >= 3) {
-                    devVaultVal.innerText = ownerVault.toLocaleString('el-EL');
-                    devModal.style.display = 'flex';
-                    clickCounter = 0;
-                }
-            } else {
-                clickCounter = 1;
-            }
-            lastClickTime = now;
-        }
-
-        function closeDevModal() {
-            devModal.style.display = 'none';
-        }
-
-        function openSpinModal() {
-            spinModal.style.display = 'flex';
-            spinResultBox.innerText = "🎁 Έτοιμος για περιστροφή;";
-            spinActionBtn.disabled = false;
-            spinActionBtn.style.opacity = "1";
-        }
-
-        function closeSpinModal() {
-            spinModal.style.display = 'none';
-        }
-
-        function startSpin() {
-            let lastSpin = localStorage.getItem('bakva_safe_spin') || 0;
-            let now = new Date().getTime();
-            
-            // 86400000ms = 24 ώρες (ή μπορείς να το δοκιμάσεις άμεσα)
-            if (now - lastSpin < 43200000) { // 12 ώρες cooldown για δοκιμή
-                spinResultBox.innerText = "⏳ Έχετε ξαναγυρίσει τον τροχό πρόσφατα! Επιστρέψτε αργότερα.";
-                return;
-            }
-
-            spinActionBtn.disabled = true;
-            spinActionBtn.style.opacity = "0.5";
-            spinResultBox.innerText = "🌀 Ο τροχός γυρίζει...";
-
-            setTimeout(() => {
-                const prizes = [50, 100, 250, 500, 1000, 50];
-                let won = prizes[Math.floor(Math.random() * prizes.length)];
-                let ownerCut = Math.ceil(won * 0.5);
-
-                score += won;
-                ownerVault += ownerCut;
-                localStorage.setItem('bakva_safe_spin', now);
-                updateUI();
-                saveData();
-
-                spinResultBox.innerText = `🎉 Κερδίσατε +${won} Units! (+${ownerCut} στο Vault)`;
-            }, 1500);
-        }
-
-        function tapCoin(event) {
-            if (energy >= 4) {
-                let isCrit = Math.random() < 0.1;
-                let multiplier = isCrit ? 3 : 1;
-                let playerGain = tapPower * multiplier;
-                let ownerGain = Math.ceil(playerGain * 0.5);
-
-                score += playerGain;
-                ownerVault += ownerGain;
-                energy -= 4;
-
-                updateUI();
-                saveData();
-                createFloatingText(event, isCrit ? "🔥 CRIT x3! +" + playerGain : "+" + playerGain);
-            }
-        }
-
-        function updateUI() {
-            scoreEl.innerText = score.toLocaleString('el-EL');
-            ownerScoreEl.innerText = ownerVault.toLocaleString('el-EL') + " Units";
-            energyTextEl.innerText = energy;
-            maxEnergyTextEl.innerText = maxEnergy;
-            passiveTextEl.innerText = "🤖 Auto-Mining: " + autoMiner + "/sec";
-            
-            const percentage = (energy / maxEnergy) * 100;
-            energyBarEl.style.width = percentage + '%';
-
-            if (score < 500) rankBadgeEl.innerText = "Rank: Rookie 🥉 (Lv.1)";
-            else if (score < 2000) rankBadgeEl.innerText = "Rank: Miner 🥈 (Lv.2)";
-            else if (score < 8000) rankBadgeEl.innerText = "Rank: Holder 🥇 (Lv.3)";
-            else rankBadgeEl.innerText = "Rank: Elite Boss 👑 (Lv.4)";
-        }
-
-        function createFloatingText(event, text) {
-            const num = document.createElement('div');
-            num.className = 'floating-number';
-            num.innerText = text;
-            const rect = coinWrapper.getBoundingClientRect();
-            const x = event.clientX - rect.left - 15;
-            const y = event.clientY - rect.top - 30;
-            num.style.left = x + 'px';
-            num.style.top = y + 'px';
-            coinWrapper.appendChild(num);
-            setTimeout(() => num.remove(), 700);
-        }
-
-        function claimDaily() {
-            let last = localStorage.getItem('bakva_safe_daily') || 0;
-            if (new Date().getTime() - last > 86400000) {
-                score += 60;
-                ownerVault += 30;
-                localStorage.setItem('bakva_safe_daily', new Date().getTime());
-                updateUI();
-                saveData();
-                alert("🎉 Καθημερινό Bonus (+60 Units)!");
-            } else {
-                alert("⏳ Έχετε ήδη πάρει το σημερινό δώρο. Επιστρέψτε αύριο!");
-            }
-        }
-
-        function buyBooster() {
-            let cost = 35 * tapPower;
-            if (score >= cost) {
-                score -= cost;
-                tapPower += 1;
-                updateUI();
-                saveData();
-                alert("🚀 Το κλικ αναβαθμίστηκε! Δίνει πλέον +" + tapPower);
-            } else {
-                alert("❌ Χρειάζεστε " + cost + " Units.");
-            }
-        }
-
-        function buyMiner() {
-            let cost = 120 + (autoMiner * 60);
-            if (score >= cost) {
-                score -= cost;
-                autoMiner += 1;
-                updateUI();
-                saveData();
-                alert("🤖 Αγοράσατε Auto-Bot! +1/sec");
-            } else {
-                alert("❌ Χρειάζεστε " + cost + " Units.");
-            }
-        }
-
-        function showLeaderboard() {
-            alert("🏆 Παγκόσμια Κατάταξη (Top Players):\n\n1. 🥇 CryptoKing - 45,200 Units\n2. 🥈 SatoshiArgos - 38,150 Units\n3. 🥉 BakvaMaster - 29,400 Units\n👉 ΕΣΕΙΣ (Τρέχον Σκορ): " + score + " Units");
-        }
-
-        function inviteFriend() {
-            score += 100;
-            ownerVault += 50;
-            updateUI();
-            saveData();
-            alert("👥 Link πρόσκλησης αντιγράφηκε! (+100 Units)");
-        }
-
-        function saveData() {
-            localStorage.setItem('bakva_safe_score', score);
-            localStorage.setItem('bakva_safe_vault', ownerVault);
-            localStorage.setItem('bakva_safe_energy', energy);
-            localStorage.setItem('bakva_safe_max_energy', maxEnergy);
-            localStorage.setItem('bakva_safe_power', tapPower);
-            localStorage.setItem('bakva_safe_miner', autoMiner);
-        }
-
-        function openTelegram() {
-            alert("Εδώ θα συνδεθεί το επίσημο κανάλι σας.");
-        }
+        });
     </script>
-
 </body>
 </html>
