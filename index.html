@@ -82,10 +82,10 @@
 
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 4px;
             width: 100%;
-            max-width: 350px;
+            max-width: 360px;
         }
         .menu-btn {
             background: rgba(255, 255, 255, 0.08);
@@ -147,7 +147,7 @@
         <button class="coin-btn" id="coinButton">BAK</button>
     </div>
 
-    <!-- 6 Κάτω Κουμπιά Μενού -->
+    <!-- 7 Κάτω Κουμπιά Μενού -->
     <div class="menu-grid">
         <button class="menu-btn" onclick="openModal('shopModalOverlay')">🛒 Shop</button>
         <button class="menu-btn" onclick="openModal('dailyModalOverlay')">🎁 Daily</button>
@@ -155,19 +155,20 @@
         <button class="menu-btn" onclick="openModal('tapModalOverlay')">⚡ Tap+1</button>
         <button class="menu-btn" onclick="openModal('botModalOverlay')">🤖 Bot</button>
         <button class="menu-btn" onclick="openModal('topModalOverlay')">🏆 Top</button>
+        <button class="menu-btn" onclick="openModal('vipCardModalOverlay')" style="grid-column: span 2; background: rgba(241,196,15,0.2); border-color: #f1c40f;">🎴 VIP Pass (0.2 SOL)</button>
     </div>
 
     <!-- 1. SHOP MODAL -->
     <div id="shopModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>🛒 BAKVA Store</h3>
-            <p>Αποκτήστε προνόμια και ενισχύσεις!</p>
+            <p>Αποκτήστε προνόμια με πραγματικά SOL!</p>
             <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin: 8px 0;">
                 <b>⚡ Super Turbo Boost</b><br>
-                <span style="font-size: 11px; color: #f1c40f;">Τιμή: 0.1 SOL</span><br>
+                <span style="font-size: 11px; color: #f1c40f;">Τιμή: 0.2 SOL (~13.10€)</span><br>
                 <span style="font-size: 10px; color: #aaa;">Διπλασιασμός κλικ για πάντα</span>
             </div>
-            <button class="modal-btn" onclick="buyItem()">Αντιγραφή Διεύθυνσης (0.1 SOL)</button>
+            <button class="modal-btn" onclick="buyItem('0.2')">Αντιγραφή Διεύθυνσης (0.2 SOL)</button>
             <button class="modal-close-btn" onclick="closeModal('shopModalOverlay')">Κλείσιμο</button>
         </div>
     </div>
@@ -176,7 +177,7 @@
     <div id="dailyModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>🎁 Daily Bonus</h3>
-            <p>Επιστρέψτε καθημερινά για να πάρετε δωρεάν πόντους και ανταμοιβές!</p>
+            <p>Επιστρέψτε καθημερινά για δωρεάν πόντους!</p>
             <button class="modal-btn" onclick="claimDaily()">🎁 Παραλαβή Δώρου</button>
             <button class="modal-close-btn" onclick="closeModal('dailyModalOverlay')">Κλείσιμο</button>
         </div>
@@ -186,8 +187,8 @@
     <div id="spinModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>🎡 Lucky Spin</h3>
-            <p>Γυρίστε τον τροχό της τύχης και κερδίστε έως και 1000 πόντους!</p>
-            <button class="modal-btn" onclick="alert('Ο τροχός γυρίζει...')">Γύρισμα Τροχού</button>
+            <p>Γυρίστε τον τροχό και κερδίστε πόντους!</p>
+            <button class="modal-btn" onclick="spinWheel()">Γύρισμα Τροχού</button>
             <button class="modal-close-btn" onclick="closeModal('spinModalOverlay')">Κλείσιμο</button>
         </div>
     </div>
@@ -196,7 +197,7 @@
     <div id="tapModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>⚡ Tap Upgrade</h3>
-            <p>Αναβαθμίστε την ισχύ του κάθε κλικ σας για πιο γρήγορο κέρδος.</p>
+            <p>Αναβαθμίστε την ισχύ του κάθε κλικ σας.</p>
             <button class="modal-btn" onclick="upgradeTap()">Αναβάθμιση (Κόστος: 50)</button>
             <button class="modal-close-btn" onclick="closeModal('tapModalOverlay')">Κλείσιμο</button>
         </div>
@@ -206,7 +207,7 @@
     <div id="botModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>🤖 Auto Bot</h3>
-            <p>Το Auto Bot μαζεύει πόντους για εσάς αυτόματα ακόμα κι όταν δεν παίζετε!</p>
+            <p>Το Auto Bot μαζεύει πόντους αυτόματα για εσάς.</p>
             <button class="modal-btn" onclick="activateBot()">Ενεργοποίηση Bot</button>
             <button class="modal-close-btn" onclick="closeModal('botModalOverlay')">Κλείσιμο</button>
         </div>
@@ -216,13 +217,28 @@
     <div id="topModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>🏆 Top Players</h3>
-            <p>Δείτε τους κορυφαίους παίκτες της παγκόσμιας κατάταξης.</p>
+            <p>Δείτε τους κορυφαίους παίκτες.</p>
             <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin: 8px 0; font-size: 11px;">
                 1. BAKVA King - 15,400 pts<br>
                 2. Player_Test - 5,200 pts<br>
                 3. You - <span id="topScoreText">0</span> pts
             </div>
             <button class="modal-close-btn" onclick="closeModal('topModalOverlay')">Κλείσιμο</button>
+        </div>
+    </div>
+
+    <!-- 7. VIP CARD MODAL (SOL PAYMENT) -->
+    <div id="vipCardModalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🎴 Συλλεκτική Κάρτα VIP Pass</h3>
+            <p>Αποκτήστε την αποκλειστική συλλεκτική κάρτα με απευθείας πληρωμή SOL για τεράστια ισχύ!</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin: 8px 0;">
+                <b>🌟 BAKVA Founder Card</b><br>
+                <span style="font-size: 11px; color: #f1c40f;">Τιμή: 0.2 SOL (~13.10€)</span><br>
+                <span style="font-size: 10px; color: #aaa;">Μόνιμο +10 κλικ ανά πάτημα</span>
+            </div>
+            <button class="modal-btn" onclick="buyItem('0.2')">Αγορά Κάρτας (Αντιγραφή SOL)</button>
+            <button class="modal-close-btn" onclick="closeModal('vipCardModalOverlay')">Κλείσιμο</button>
         </div>
     </div>
 
@@ -239,9 +255,9 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        function buyItem() {
+        function buyItem(amount) {
             navigator.clipboard.writeText(OWNER_SOL_WALLET).then(() => {
-                alert("Η διεύθυνση Solana αντιγράφηκε:\n\n" + OWNER_SOL_WALLET + "\n\nΣτείλτε ακριβώς 0.1 SOL για την αγορά.");
+                alert("Η διεύθυνση Solana αντιγράφηκε:\n\n" + OWNER_SOL_WALLET + "\n\nΣτείλτε ακριβώς " + amount + " SOL για την αγορά.");
             }).catch(() => {
                 alert("Διεύθυνση λήψης SOL:\n" + OWNER_SOL_WALLET);
             });
@@ -250,8 +266,16 @@
         function claimDaily() {
             score += 50;
             updateScore();
-            alert("Πήρατε 50 δωρεάν πόντους καθημερινής επιβράβευσης!");
+            alert("Πήρατε 50 δωρεάν πόντους!");
             closeModal('dailyModalOverlay');
+        }
+
+        function spinWheel() {
+            let win = Math.floor(Math.random() * 200) + 50;
+            score += win;
+            updateScore();
+            alert("Κερδίσατε " + win + " πόντους από τον τροχό!");
+            closeModal('spinModalOverlay');
         }
 
         function upgradeTap() {
@@ -259,14 +283,14 @@
                 score -= 50;
                 clickPower += 1;
                 updateScore();
-                alert("Επιτυχής αναβάθμιση! Τώρα παίρνετε +" + clickPower + " ανά κλικ.");
+                alert("Επιτυχής αναβάθμιση! +1 ισχύς κλικ.");
             } else {
                 alert("Δεν έχετε αρκετούς πόντους (Χρειάζεστε 50).");
             }
         }
 
         function activateBot() {
-            alert("Το Auto Bot ενεργοποιήθηκε και δουλεύει για εσάς!");
+            alert("Το Auto Bot ενεργοποιήθηκε!");
             closeModal('botModalOverlay');
         }
 
