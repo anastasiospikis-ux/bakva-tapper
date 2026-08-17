@@ -100,7 +100,7 @@
         }
         .menu-btn:hover { background: rgba(255,255,255,0.2); }
 
-        /* Modal Styles */
+        /* Modal Styles - Explicit display control */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); display: none;
@@ -228,7 +228,6 @@
     <script>
         const OWNER_SOL_WALLET = "CiWjs9UYMhqwgN5CD9qKSGHK36aZPwy5ssJ1QorzxTM4";
 
-        // Γενικές συναρτήσεις για άνοιγμα/κλείσιμο παραθύρων
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
             if(modalId === 'topModalOverlay') {
@@ -240,11 +239,11 @@
         }
 
         function buyItem() {
-            const solanaPayUrl = `solana:${OWNER_SOL_WALLET}?amount=0.1&label=BAKVA%20Empire%20Boost&message=Super%20Turbo%20Boost`;
-            window.location.href = solanaPayUrl;
-            setTimeout(() => {
+            navigator.clipboard.writeText(OWNER_SOL_WALLET).then(() => {
+                alert("Η διεύθυνση Solana αντιγράφηκε:\n\n" + OWNER_SOL_WALLET + "\n\nΣτείλτε 0.1 SOL για την αγορά.");
+            }).catch(() => {
                 alert("Διεύθυνση λήψης SOL:\n" + OWNER_SOL_WALLET);
-            }, 500);
+            });
         }
 
         function claimDaily() {
@@ -270,7 +269,6 @@
             closeModal('botModalOverlay');
         }
 
-        // Λογική κλικ και Firebase
         let score = 0;
         let clickPower = 1;
         const coinBtn = document.getElementById('coinButton');
