@@ -47,23 +47,9 @@
             height: 100vh;
             overflow: hidden;
         }
-        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; background: rgba(255,215,0,0.08); padding: 4px 8px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); cursor: pointer; }
+        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; background: rgba(255,215,0,0.08); padding: 4px 8px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); }
         .rank-badge { font-size: 11px; color: #f1c40f; font-weight: bold; }
         
-        .owner-vault {
-            width: 100%;
-            max-width: 350px;
-            background: linear-gradient(135deg, #b91d47, #7f1d1d);
-            border-radius: 6px;
-            padding: 3px 8px;
-            font-size: 10px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #f87171;
-        }
-
         .score-box {
             font-size: 32px;
             font-weight: 900;
@@ -71,7 +57,6 @@
             text-shadow: 0 0 12px rgba(241, 196, 15, 0.6);
             margin: 0;
         }
-        .passive-income { font-size: 9px; color: #2ecc71; font-weight: bold; }
 
         .coin-wrapper { position: relative; margin: 2px 0; }
         .coin-btn {
@@ -94,19 +79,7 @@
             position: relative;
         }
         .coin-btn:active { transform: scale(0.90); }
-        .floating-number {
-            position: absolute;
-            font-size: 18px;
-            font-weight: bold;
-            color: #2ecc71;
-            text-shadow: 0 0 4px black;
-            pointer-events: none;
-            animation: floatUp 0.7s ease-out forwards;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-50px) scale(1.3); }
-        }
+
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -117,51 +90,15 @@
         .menu-btn {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255,255,255,0.15);
-            padding: 4px 2px;
+            padding: 6px 2px;
             border-radius: 6px;
             color: white;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
         }
         .menu-btn:hover { background: rgba(255,255,255,0.2); }
-        .panel {
-            width: 100%;
-            max-width: 350px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 6px;
-            padding: 4px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .energy-bar-container {
-            width: 100%;
-            background: rgba(0,0,0,0.5);
-            border-radius: 4px;
-            height: 6px;
-            padding: 1px;
-            margin-top: 2px;
-        }
-        .energy-bar {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(90deg, #2ecc71, #27ae60);
-            border-radius: 3px;
-            transition: width 0.2s linear;
-        }
-        .energy-info { display: flex; justify-content: space-between; font-size: 8px; color: #ccc; }
-        .tg-btn {
-            margin-top: 3px;
-            width: 100%;
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 4px;
-            border-radius: 5px;
-            font-size: 10px;
-            font-weight: bold;
-            cursor: pointer;
-        }
 
         /* Modal Styles */
         .modal-overlay {
@@ -179,7 +116,11 @@
         .modal-box p, .modal-box div { font-size: 11px; color: #ddd; line-height: 1.3; text-align: left; }
         .modal-btn {
             background: #f39c12; color: white; border: none; padding: 6px 14px;
-            font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 8px; font-size: 12px;
+            font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 8px; font-size: 12px; width: 100%;
+        }
+        .modal-close-btn {
+            background: #e74c3c; color: white; border: none; padding: 6px 14px;
+            font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 4px; font-size: 12px; width: 100%;
         }
     </style>
 </head>
@@ -189,8 +130,8 @@
     <div id="tutorialModal" class="modal-overlay" style="display: flex;">
         <div class="modal-box">
             <h3>👑 Καλώς ήρθατε</h3>
-            <p>Μαζέψτε πόντους και χτίστε την αυτοκρατορία σας!</p>
-            <button class="modal-btn" onclick="document.getElementById('tutorialModal').style.display='none'">Συνέχεια</button>
+            <p>Μαζέψτε πόντους πατώντας το κουμπί BAK και χτίστε την αυτοκρατορία σας!</p>
+            <button class="modal-btn" onclick="closeModal('tutorialModal')">Συνέχεια</button>
         </div>
     </div>
 
@@ -206,17 +147,17 @@
         <button class="coin-btn" id="coinButton">BAK</button>
     </div>
 
-    <!-- Μενού με το κουμπί Shop -->
+    <!-- 6 Κάτω Κουμπιά Μενού -->
     <div class="menu-grid">
-        <button class="menu-btn" onclick="openShopModal()">🛒 Shop</button>
-        <button class="menu-btn" onclick="alert('Daily')">🎁 Daily</button>
-        <button class="menu-btn" onclick="alert('Spin')">🎡 Spin</button>
-        <button class="menu-btn" onclick="alert('Tap+1')">⚡ Tap+1</button>
-        <button class="menu-btn" onclick="alert('Bot')">🤖 Bot</button>
-        <button class="menu-btn" onclick="alert('Top')">🏆 Top</button>
+        <button class="menu-btn" onclick="openModal('shopModalOverlay')">🛒 Shop</button>
+        <button class="menu-btn" onclick="openModal('dailyModalOverlay')">🎁 Daily</button>
+        <button class="menu-btn" onclick="openModal('spinModalOverlay')">🎡 Spin</button>
+        <button class="menu-btn" onclick="openModal('tapModalOverlay')">⚡ Tap+1</button>
+        <button class="menu-btn" onclick="openModal('botModalOverlay')">🤖 Bot</button>
+        <button class="menu-btn" onclick="openModal('topModalOverlay')">🏆 Top</button>
     </div>
 
-    <!-- SHOP MODAL -->
+    <!-- 1. SHOP MODAL -->
     <div id="shopModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>🛒 BAKVA Store</h3>
@@ -225,47 +166,126 @@
                 <b>⚡ Super Turbo Boost</b><br>
                 <span style="font-size: 10px; color: #f1c40f;">Διπλασιασμός κλικ</span>
             </div>
-            <button class="modal-btn" onclick="buyItem()">Αγορά με SOL</button><br>
-            <button class="modal-btn" style="background: #e74c3c;" onclick="closeShopModal()">Κλείσιμο</button>
+            <button class="modal-btn" onclick="buyItem()">Αγορά με SOL</button>
+            <button class="modal-close-btn" onclick="closeModal('shopModalOverlay')">Κλείσιμο</button>
+        </div>
+    </div>
+
+    <!-- 2. DAILY MODAL -->
+    <div id="dailyModalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🎁 Daily Bonus</h3>
+            <p>Επιστρέψτε καθημερινά για να πάρετε δωρεάν πόντους και ανταμοιβές!</p>
+            <button class="modal-btn" onclick="claimDaily()">🎁 Παραλαβή Δώρου</button>
+            <button class="modal-close-btn" onclick="closeModal('dailyModalOverlay')">Κλείσιμο</button>
+        </div>
+    </div>
+
+    <!-- 3. SPIN MODAL -->
+    <div id="spinModalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🎡 Lucky Spin</h3>
+            <p>Γυρίστε τον τροχό της τύχης και κερδίστε έως και 1000 πόντους!</p>
+            <button class="modal-btn" onclick="alert('Ο τροχός γυρίζει...')">Γύρισμα Τροχού</button>
+            <button class="modal-close-btn" onclick="closeModal('spinModalOverlay')">Κλείσιμο</button>
+        </div>
+    </div>
+
+    <!-- 4. TAP+1 MODAL -->
+    <div id="tapModalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3>⚡ Tap Upgrade</h3>
+            <p>Αναβαθμίστε την ισχύ του κάθε κλικ σας για πιο γρήγορο κέρδος.</p>
+            <button class="modal-btn" onclick="upgradeTap()">Αναβάθμιση (Κόστος: 50)</button>
+            <button class="modal-close-btn" onclick="closeModal('tapModalOverlay')">Κλείσιμο</button>
+        </div>
+    </div>
+
+    <!-- 5. BOT MODAL -->
+    <div id="botModalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🤖 Auto Bot</h3>
+            <p>Το Auto Bot μαζεύει πόντους για εσάς αυτόματα ακόμα κι όταν δεν παίζετε!</p>
+            <button class="modal-btn" onclick="activateBot()">Ενεργοποίηση Bot</button>
+            <button class="modal-close-btn" onclick="closeModal('botModalOverlay')">Κλείσιμο</button>
+        </div>
+    </div>
+
+    <!-- 6. TOP MODAL -->
+    <div id="topModalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🏆 Top Players</h3>
+            <p>Δείτε τους κορυφαίους παίκτες της παγκόσμιας κατάταξης.</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin: 8px 0; font-size: 11px;">
+                1. BAKVA King - 15,400 pts<br>
+                2. Player_Test - 5,200 pts<br>
+                3. You - <span id="topScoreText">0</span> pts
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('topModalOverlay')">Κλείσιμο</button>
         </div>
     </div>
 
     <script>
-        // Η διεύθυνση Solana σου για τα έσοδα
         const OWNER_SOL_WALLET = "CiWjs9UYMhqwgN5CD9qKSGHK36aZPwy5ssJ1QorzxTM4";
 
-        // Λειτουργίες Shop
-        function openShopModal() {
-            document.getElementById('shopModalOverlay').style.display = 'flex';
+        // Γενικές συναρτήσεις για άνοιγμα/κλείσιμο παραθύρων
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            if(modalId === 'topModalOverlay') {
+                document.getElementById('topScoreText').innerText = score;
+            }
         }
-        function closeShopModal() {
-            document.getElementById('shopModalOverlay').style.display = 'none';
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
+
         function buyItem() {
-            // Δημιουργία συνδέσμου πληρωμής Solana για το πορτοφόλι σου
             const solanaPayUrl = `solana:${OWNER_SOL_WALLET}?amount=0.1&label=BAKVA%20Empire%20Boost&message=Super%20Turbo%20Boost`;
-            
-            // Προσπάθεια άνοιξης του πορτοφολιού (Phantom κλπ)
             window.location.href = solanaPayUrl;
-            
-            // Ενημέρωση σε περίπτωση που δεν ανοίξει αυτόματα εφαρμογή πορτοφολιού
             setTimeout(() => {
                 alert("Διεύθυνση λήψης SOL:\n" + OWNER_SOL_WALLET);
             }, 500);
         }
 
+        function claimDaily() {
+            score += 50;
+            updateScore();
+            alert("Πήρατε 50 δωρεάν πόντους καθημερινής επιβράβευσης!");
+            closeModal('dailyModalOverlay');
+        }
+
+        function upgradeTap() {
+            if(score >= 50) {
+                score -= 50;
+                clickPower += 1;
+                updateScore();
+                alert("Επιτυχής αναβάθμιση! Τώρα παίρνετε +" + clickPower + " ανά κλικ.");
+            } else {
+                alert("Δεν έχετε αρκετούς πόντους (Χρειάζεστε 50).");
+            }
+        }
+
+        function activateBot() {
+            alert("Το Auto Bot ενεργοποιήθηκε και δουλεύει για εσάς!");
+            closeModal('botModalOverlay');
+        }
+
         // Λογική κλικ και Firebase
         let score = 0;
+        let clickPower = 1;
         const coinBtn = document.getElementById('coinButton');
         const scoreDisplay = document.getElementById('scoreDisplay');
 
-        coinBtn.addEventListener('click', () => {
-            score += 1;
+        function updateScore() {
             scoreDisplay.innerText = score;
-
             if (typeof window.savePlayerScore === 'function') {
                 window.savePlayerScore("player_test_user", score);
             }
+        }
+
+        coinBtn.addEventListener('click', () => {
+            score += clickPower;
+            updateScore();
         });
     </script>
 </body>
