@@ -100,7 +100,7 @@
         }
         .menu-btn:hover { background: rgba(255,255,255,0.2); }
 
-        /* Modal Styles - Explicit display control */
+        /* Modal Styles */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); display: none;
@@ -164,9 +164,10 @@
             <p>Αποκτήστε προνόμια και ενισχύσεις!</p>
             <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin: 8px 0;">
                 <b>⚡ Super Turbo Boost</b><br>
-                <span style="font-size: 10px; color: #f1c40f;">Διπλασιασμός κλικ</span>
+                <span style="font-size: 11px; color: #f1c40f;">Τιμή: 0.1 SOL</span><br>
+                <span style="font-size: 10px; color: #aaa;">Διπλασιασμός κλικ για πάντα</span>
             </div>
-            <button class="modal-btn" onclick="buyItem()">Αγορά με SOL</button>
+            <button class="modal-btn" onclick="buyItem()">Αντιγραφή Διεύθυνσης (0.1 SOL)</button>
             <button class="modal-close-btn" onclick="closeModal('shopModalOverlay')">Κλείσιμο</button>
         </div>
     </div>
@@ -240,7 +241,7 @@
 
         function buyItem() {
             navigator.clipboard.writeText(OWNER_SOL_WALLET).then(() => {
-                alert("Η διεύθυνση Solana αντιγράφηκε:\n\n" + OWNER_SOL_WALLET + "\n\nΣτείλτε 0.1 SOL για την αγορά.");
+                alert("Η διεύθυνση Solana αντιγράφηκε:\n\n" + OWNER_SOL_WALLET + "\n\nΣτείλτε ακριβώς 0.1 SOL για την αγορά.");
             }).catch(() => {
                 alert("Διεύθυνση λήψης SOL:\n" + OWNER_SOL_WALLET);
             });
