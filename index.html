@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAKVA Empire - Ultimate Pro Edition</title>
     
+    <!-- Solana Web3.js SDK για σύνδεση με πορτοφόλι -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
     <!-- Firebase SDKs & Database Config -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -138,7 +141,7 @@
     <!-- Header & Score -->
     <div class="header">
         <span class="rank-badge">🏆 BAKVA Empire</span>
-        <span style="font-size: 10px; color: #2ecc71;">Online</span>
+        <button id="walletConnectBtn" onclick="connectWallet()" style="background:#27ae60; color:white; border:none; padding:3px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">Σύνδεση Πορτοφολιού</button>
     </div>
 
     <div class="score-box" id="scoreDisplay">0</div>
@@ -168,7 +171,7 @@
                 <span style="font-size: 11px; color: #f1c40f;">Τιμή: 0.2 SOL (~13.10€)</span><br>
                 <span style="font-size: 10px; color: #aaa;">Διπλασιασμός κλικ για πάντα</span>
             </div>
-            <button class="modal-btn" onclick="buyItem('0.2')">Αντιγραφή Διεύθυνσης (0.2 SOL)</button>
+            <button class="modal-btn" onclick="sendSolPayment(0.2)">Αγορά με Πορτοφόλι (0.2 SOL)</button>
             <button class="modal-close-btn" onclick="closeModal('shopModalOverlay')">Κλείσιμο</button>
         </div>
     </div>
@@ -231,19 +234,73 @@
     <div id="vipCardModalOverlay" class="modal-overlay">
         <div class="modal-box">
             <h3>🎴 Συλλεκτική Κάρτα VIP Pass</h3>
-            <p>Αποκτήστε την αποκλειστική συλλεκτική κάρτα με απευθείας πληρωμή SOL για τεράστια ισχύ!</p>
+            <p>Αποκτήστε την αποκλειστική συλλεκτική κάρτα με αυτόματη πληρωμή SOL!</p>
             <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin: 8px 0;">
                 <b>🌟 BAKVA Founder Card</b><br>
                 <span style="font-size: 11px; color: #f1c40f;">Τιμή: 0.2 SOL (~13.10€)</span><br>
                 <span style="font-size: 10px; color: #aaa;">Μόνιμο +10 κλικ ανά πάτημα</span>
             </div>
-            <button class="modal-btn" onclick="buyItem('0.2')">Αγορά Κάρτας (Αντιγραφή SOL)</button>
+            <button class="modal-btn" onclick="sendSolPayment(0.2)">Αγορά με Πορτοφόλι (0.2 SOL)</button>
             <button class="modal-close-btn" onclick="closeModal('vipCardModalOverlay')">Κλείσιμο</button>
         </div>
     </div>
 
     <script>
         const OWNER_SOL_WALLET = "CiWjs9UYMhqwgN5CD9qKSGHK36aZPwy5ssJ1QorzxTM4";
+        let userWallet = null;
+
+        async function connectWallet() {
+            try {
+                if ("solana" in window) {
+                    const provider = window.solana;
+                    if (provider.isPhantom || provider.isSolflare) {
+                        const response = await provider.connect();
+                        userWallet = response.publicKey.toString();
+                        document.getElementById('walletConnectBtn').innerText = userWallet.slice(0, 4) + "..." + userWallet.slice(-4);
+                        alert("Το πορτοφόλι συνδέθηκε επιτυχώς!");
+                        return;
+                    }
+                }
+                alert("Δεν βρέθηκε συμβατό πορτοφόλι Solana (Phantom/Solflare). Εγκαταστήστε κάποιο.");
+            } catch (err) {
+                console.error(err);
+                alert("Αποτυχία σύνδεσης πορτοφολιού.");
+            }
+        }
+
+        async function sendSolPayment(amountInSol) {
+            try {
+                if (!window.solana || !window.solana.isConnected) {
+                    alert("Παρακαλώ συνδέστε πρώτα το πορτοφόλι σας από το πάνω δεξιά κουμπί!");
+                    await connectWallet();
+                    if (!window.solana.isConnected) return;
+                }
+
+                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+                const transaction = new solanaWeb3.Transaction().add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: window.solana.publicKey,
+                        toPubkey: new solanaWeb3.PublicKey(OWNER_SOL_WALLET),
+                        lamports: amountInSol * solanaWeb3.LAMPORTS_PER_SOL,
+                    })
+                );
+
+                transaction.feePayer = window.solana.publicKey;
+                const { blockhash } = await connection.getLatestBlockhash();
+                transaction.recentBlockhash = blockhash;
+
+                const signed = await window.solana.signAndSendTransaction(transaction);
+                alert("Η συναλλαγή ολοκληρώθηκε με επιτυχία! Υπογραφή: " + signed.signature);
+                
+                // Δίνουμε τα προνόμια στον παίκτη αυτόματα
+                clickPower += (amountInSol === 0.2 ? 10 : 2);
+                updateScore();
+                
+            } catch (err) {
+                console.error(err);
+                alert("Η συναλλαγή ακυρώθηκε ή απέτυχε.");
+            }
+        }
 
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
@@ -253,14 +310,6 @@
         }
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-        }
-
-        function buyItem(amount) {
-            navigator.clipboard.writeText(OWNER_SOL_WALLET).then(() => {
-                alert("Η διεύθυνση Solana αντιγράφηκε:\n\n" + OWNER_SOL_WALLET + "\n\nΣτείλτε ακριβώς " + amount + " SOL για την αγορά.");
-            }).catch(() => {
-                alert("Διεύθυνση λήψης SOL:\n" + OWNER_SOL_WALLET);
-            });
         }
 
         function claimDaily() {
