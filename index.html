@@ -1,81 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAKVA Empire - Ultimate Pro Edition</title>
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        const firebaseConfig = { apiKey: "AIzaSyCNHrY94rLwJ0bq_WHkF8...", authDomain: "bakva-game.firebaseapp.com", projectId: "bakva-game", storageBucket: "bakva-game.appspot.com", messagingSenderId: "645831669827", appId: "1:645831669827:web:140b053b...", measurementId: "G-EP0VCGZMPJ" };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        window.savePlayerScore = function(userId, score) { set(ref(db, 'players/' + userId), { score: score, lastUpdated: Date.now() }); };
-    </script>
-    <style>
-        * { box-sizing: border-box; user-select: none; }
-        body { background: radial-gradient(circle, #0b0714, #150f26, #05030a); font-family: 'Segoe UI', sans-serif; color: white; text-align: center; margin: 0; padding: 5px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100vh; overflow: hidden; }
-        .header { width: 100%; display: flex; justify-content: space-between; align-items: center; background: rgba(255,215,0,0.08); padding: 4px 8px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); }
-        .score-box { font-size: 32px; font-weight: 900; color: #f1c40f; margin: 10px 0; }
-        .coin-btn { background: radial-gradient(circle, #f39c12, #d35400); border: 4px solid #f1c40f; width: 120px; height: 120px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; }
-        .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; width: 100%; max-width: 400px; padding: 10px; }
-        .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); padding: 10px 2px; border-radius: 6px; color: white; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: none; align-items:center; justify-content:center; z-index: 1000; }
-        .modal-box { background: #1e1b4b; border: 2px solid #f1c40f; border-radius: 12px; width: 90%; max-width: 300px; padding: 20px; text-align: center; }
-        .btn-action { background: #f39c12; color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; cursor: pointer; margin-top: 10px; }
-        .btn-close { background: #e74c3c; color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; cursor: pointer; margin-top: 5px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAKVA Empire - Ultimate Pro Edition</title>
+<script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  const firebaseConfig = { apiKey: "AIzaSyCNMyY94K9qKSGHk36aZPWy5sJjIQ0rzTM4", authDomain: "bakva-game.firebaseapp.com", projectId: "bakva-game", storageBucket: "bakva-game.appspot.com", messagingSenderId: "367204683072", appId: "1:367204683072:web:a62b8849b29dc99c82c694" };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  window.savePlayerScore = function(userId, score) { set(ref(db, 'players/' + userId), { score: score, lastUpdated: Date.now() }); };
+</script>
+<style>
+  * { box-sizing: border-box; user-select: none; }
+  body { background: radial-gradient(circle, #0b0714, #150f20, #05030a); color: #f1c40f; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100vh; margin: 0; padding: 10px; overflow: hidden; }
+  header { width: 100%; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+  .score-box { font-size: 32px; font-weight: 900; color: #f1c40f; margin: 10px 0; }
+  .coin-btn { background: radial-gradient(circle, #f9c12, #d35400); border: 4px solid #f1c40f; width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: white; cursor: pointer; box-shadow: 0 0 25px rgba(243, 156, 18, 0.4); transition: transform 0.1s; }
+  .coin-btn:active { transform: scale(0.92); }
+  .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; width: 100%; max-width: 400px; }
+  .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); padding: 10px 2px; border-radius: 8px; color: white; font-size: 11px; cursor: pointer; text-align: center; }
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; }
+  .modal-box { background: #1e1b4b; border: 2px solid #f1c40f; border-radius: 12px; width: 90%; max-width: 300px; padding: 20px; text-align: center; color: white; }
+  .btn-action { background: #f39c12; color: white; border: none; padding: 10px; width: 100%; margin-top: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+  .btn-close { background: #e74c3c; color: white; border: none; padding: 10px; width: 100%; margin-top: 10px; border-radius: 6px; cursor: pointer; }
+</style>
 </head>
 <body>
-    <div class="header">
-        <span>🏆 BAKVA Empire</span>
-        <button id="walletConnectBtn" onclick="connectWallet()" style="background:#27ae60; border:none; color:white; padding:5px 10px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">Connect Wallet</button>
-    </div>
-    <div class="score-box" id="scoreDisplay">0</div>
-    <div class="coin-btn" id="coinButton">BAK</div>
-    <div class="menu-grid">
-        <button class="menu-btn" onclick="openModal('shopModalOverlay')">🛒 Shop</button>
-        <button class="menu-btn" onclick="openModal('dailyModalOverlay')">🎁 Daily</button>
-        <button class="menu-btn" onclick="openModal('spinModalOverlay')">🎡 Spin</button>
-        <button class="menu-btn" onclick="openModal('tapModalOverlay')">⚡ Tap+1</button>
-        <button class="menu-btn" onclick="openModal('botModalOverlay')">🤖 Bot</button>
-        <button class="menu-btn" onclick="openModal('topModalOverlay')">🏆 Top</button>
-        <button class="menu-btn" onclick="openModal('vipCardModalOverlay')" style="grid-column: span 2; background: rgba(241,196,15,0.2);">🎴 VIP Pass (0.2 SOL)</button>
-    </div>
 
-    <!-- Modals -->
-    <div id="shopModalOverlay" class="modal-overlay"><div class="modal-box"><h3>🛒 Store</h3><p>Boost your power!</p><button class="btn-action" onclick="sendSolPayment(0.2)">Buy Boost (0.2 SOL)</button><button class="btn-close" onclick="closeModal('shopModalOverlay')">Close</button></div></div>
-    <div id="dailyModalOverlay" class="modal-overlay"><div class="modal-box"><h3>🎁 Daily Bonus</h3><button class="btn-action" onclick="claimDaily()">Claim</button><button class="btn-close" onclick="closeModal('dailyModalOverlay')">Close</button></div></div>
-    <div id="spinModalOverlay" class="modal-overlay"><div class="modal-box"><h3>🎡 Lucky Spin</h3><button class="btn-action" onclick="spinWheel()">Spin</button><button class="btn-close" onclick="closeModal('spinModalOverlay')">Close</button></div></div>
-    <div id="tapModalOverlay" class="modal-overlay"><div class="modal-box"><h3>⚡ Tap Upgrade</h3><button class="btn-action" onclick="upgradeTap()">Upgrade (50 pts)</button><button class="btn-close" onclick="closeModal('tapModalOverlay')">Close</button></div></div>
-    <div id="botModalOverlay" class="modal-overlay"><div class="modal-box"><h3>🤖 Auto Bot</h3><button class="btn-action" onclick="activateBot()">Activate</button><button class="btn-close" onclick="closeModal('botModalOverlay')">Close</button></div></div>
-    <div id="topModalOverlay" class="modal-overlay"><div class="modal-box"><h3>🏆 Top Players</h3><p id="topScoreText">0 pts</p><button class="btn-close" onclick="closeModal('topModalOverlay')">Close</button></div></div>
-    <div id="vipCardModalOverlay" class="modal-overlay"><div class="modal-box"><h3>🎴 VIP Pass</h3><p>Price: 0.2 SOL</p><button class="btn-action" onclick="sendSolPayment(0.2)">Buy VIP</button><button class="btn-close" onclick="closeModal('vipCardModalOverlay')">Close</button></div></div>
+  <header>
+    <span>🏆 BAKVA Empire</span>
+    <button id="walletConnectBtn" onclick="connectWallet()" style="background:#27ae60; border:none; color:white; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">Connect Wallet</button>
+  </header>
 
-    <script>
-        let score = 0, clickPower = 1;
-        const OWNER_SOL_WALLET = "CiWjs9UYMhqwgN5CD9qKSGHK36aZPwy5ssJ1QorzxTM4";
-        document.getElementById('coinButton').onclick = () => { score += clickPower; document.getElementById('scoreDisplay').innerText = score; };
-        async function connectWallet() {
-            if ("solana" in window && window.solana.isPhantom) {
-                const res = await window.solana.connect();
-                document.getElementById('walletConnectBtn').innerText = "Connected";
-                alert("Wallet connected!");
-            } else { alert("Phantom not found!"); }
-        }
-        async function sendSolPayment(amt) {
-            try {
-                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
-                const transaction = new solanaWeb3.Transaction().add(solanaWeb3.SystemProgram.transfer({ fromPubkey: window.solana.publicKey, toPubkey: new solanaWeb3.PublicKey(OWNER_SOL_WALLET), lamports: amt * solanaWeb3.LAMPORTS_PER_SOL }));
-                transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-                transaction.feePayer = window.solana.publicKey;
-                const signed = await window.solana.signAndSendTransaction(transaction);
-                alert("Transaction successful!");
-            } catch (e) { alert("Transaction failed."); }
-        }
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    </script>
+  <div class="score-box" id="scoreDisplay">0</div>
+  <div class="coin-btn" id="coinBtn">BAK</div>
+
+  <div class="menu-grid">
+    <button class="menu-btn" onclick="openModal('shopModalOverlay')">🛒 Shop</button>
+    <button class="menu-btn" onclick="openModal('dailyModalOverlay')">🎁 Daily</button>
+    <button class="menu-btn" onclick="openModal('spinModalOverlay')">🎡 Spin</button>
+    <button class="menu-btn" onclick="openModal('tapModalOverlay')">⚡ Tap+1</button>
+    <button class="menu-btn" onclick="openModal('botModalOverlay')">🤖 Bot</button>
+    <button class="menu-btn" onclick="openModal('topModalOverlay')">🏆 Top</button>
+    <button class="menu-btn" onclick="openModal('vipCardModalOverlay')" style="grid-column: span 2; background: rgba(241,196,15,0.2); border-color: #f1c40f;">👑 VIP Pass (0.2 SOL)</button>
+  </div>
+
+  <!-- Modals -->
+  <div id="shopModalOverlay" class="modal-overlay"><div class="modal-box"><h2>🛒 Store</h2><p>Boost your power!</p><button class="btn-action">Buy Upgrade</button><button class="btn-close" onclick="closeModal('shopModalOverlay')">Close</button></div></div>
+  <div id="dailyModalOverlay" class="modal-overlay"><div class="modal-box"><h2>🎁 Daily Bonus</h2><button class="btn-action">Claim Reward</button><button class="btn-close" onclick="closeModal('dailyModalOverlay')">Close</button></div></div>
+  <div id="spinModalOverlay" class="modal-overlay"><div class="modal-box"><h2>🎡 Lucky Spin</h2><button class="btn-action">Spin Wheel</button><button class="btn-close" onclick="closeModal('spinModalOverlay')">Close</button></div></div>
+  <div id="tapModalOverlay" class="modal-overlay"><div class="modal-box"><h2>⚡ Tap Upgrade</h2><button class="btn-action">Upgrade (50 BAK)</button><button class="btn-close" onclick="closeModal('tapModalOverlay')">Close</button></div></div>
+  <div id="botModalOverlay" class="modal-overlay"><div class="modal-box"><h2>🤖 Auto Bot</h2><button class="btn-action">Activate Bot</button><button class="btn-close" onclick="closeModal('botModalOverlay')">Close</button></div></div>
+  <div id="topModalOverlay" class="modal-overlay"><div class="modal-box"><h2>🏆 Top Players</h2><p id="topScoreText">0 pts</p><button class="btn-close" onclick="closeModal('topModalOverlay')">Close</button></div></div>
+  <div id="vipCardModalOverlay" class="modal-overlay"><div class="modal-box"><h2>👑 VIP Pass</h2><p>Price: 0.2 SOL</p><button class="btn-action" onclick="sendSolPayment(0.2)">Buy VIP</button><button class="btn-close" onclick="closeModal('vipCardModalOverlay')">Close</button></div></div>
+
+<script>
+  let score = 0;
+  let clickPower = 1;
+  const OWNER_SOL_WALLET = "C1mjSjUYMHqngN5CD9xqKSGK36aZPWy5sJjIQ0rzTM4";
+  
+  document.getElementById('coinBtn').onclick = () => { 
+    score += clickPower; 
+    document.getElementById('scoreDisplay').innerText = score; 
+  };
+
+  // ΔΙΟΡΘΩΜΕΝΗ ΣΥΝΑΡΤΗΣΗ ΣΥΝΔΕΣΗΣ (Με Deep Linking για Phantom)
+  async function connectWallet() {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if ('solana' in window && window.solana.isPhantom) {
+      try {
+        const res = await window.solana.connect();
+        document.getElementById('walletConnectBtn').innerText = "Connected";
+        alert("Wallet connected!");
+      } catch (err) {
+        console.log("Connection rejected");
+      }
+    } else if (isMobile) {
+      const dAppUrl = encodeURIComponent(window.location.href);
+      const phantomDeepLink = `https://phantom.app/ul/browse/${dAppUrl}?ref=${dAppUrl}`;
+      window.location.href = phantomDeepLink;
+    } else {
+      alert("Phantom not found!");
+    }
+  }
+
+  async function sendSolPayment(amt) {
+    try {
+      const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+      const transaction = new solanaWeb3.Transaction().add(
+        solanaWeb3.SystemProgram.transfer({
+          fromPubkey: window.solana.publicKey,
+          toPubkey: new solanaWeb3.PublicKey(OWNER_SOL_WALLET),
+          lamports: amt * solanaWeb3.LAMPORTS_PER_SOL
+        })
+      );
+      const { blockhash } = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = window.solana.publicKey;
+      const signed = await window.solana.signAndSendTransaction(transaction);
+      alert("Transaction successful!");
+    } catch (e) {
+      alert("Transaction Failed.");
+    }
+  }
+
+  function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+</script>
 </body>
 </html>
