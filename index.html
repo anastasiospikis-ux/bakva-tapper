@@ -45,8 +45,8 @@
     <button class="menu-btn" onclick="openModal('tapModalOverlay')">⚡ Tap+1</button>
     <button class="menu-btn" onclick="openModal('botModalOverlay')">🤖 Bot</button>
     <button class="menu-btn" onclick="openModal('topModalOverlay')">🏆 Top</button>
-    <!-- Νέο κουμπί Trade Swap για το Raydium -->
-    <button class="menu-btn" onclick="window.open('https://raydium.io/swap/?inputMint=sol&outputMint=Bk5K3H', '_blank')" style="background: rgba(52, 152, 219, 0.3); border-color: #3498db;">💱 Trade Swap</button>
+    <!-- Κουμπί Trade Swap με το σωστό Contract Address -->
+    <button class="menu-btn" onclick="window.open('https://raydium.io/swap/?inputMint=sol&outputMint=Bk5K3HPXR5R45rCe5M7iSwrw4XpbnCTxoYmiK8zZpump', '_blank')" style="background: rgba(52, 152, 219, 0.3); border-color: #3498db;">💱 Trade Swap</button>
     <button class="menu-btn" onclick="openModal('vipCardModalOverlay')" style="grid-column: span 3; background: rgba(241,196,15,0.2); border-color: #f1c40f;">👑 VIP Pass (0.2 SOL)</button>
   </div>
 
@@ -69,13 +69,12 @@
     document.getElementById('scoreDisplay').innerText = score; 
   };
 
-  // ΣΥΝΑΡΤΗΣΗ ΣΥΝΔΕΣΗΣ (Με Deep Linking για Phantom)
   async function connectWallet() {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
     if ('solana' in window && window.solana.isPhantom) {
       try {
-        const res = await window.solana.connect();
+        await window.solana.connect();
         document.getElementById('walletConnectBtn').innerText = "Connected";
         alert("Wallet connected!");
       } catch (err) {
@@ -103,7 +102,7 @@
       const { blockhash } = await connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = window.solana.publicKey;
-      const signed = await window.solana.signAndSendTransaction(transaction);
+      await window.solana.signAndSendTransaction(transaction);
       alert("Transaction successful!");
     } catch (e) {
       alert("Transaction Failed.");
