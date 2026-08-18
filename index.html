@@ -45,7 +45,9 @@
     <button class="menu-btn" onclick="openModal('tapModalOverlay')">⚡ Tap+1</button>
     <button class="menu-btn" onclick="openModal('botModalOverlay')">🤖 Bot</button>
     <button class="menu-btn" onclick="openModal('topModalOverlay')">🏆 Top</button>
-    <button class="menu-btn" onclick="openModal('vipCardModalOverlay')" style="grid-column: span 2; background: rgba(241,196,15,0.2); border-color: #f1c40f;">👑 VIP Pass (0.2 SOL)</button>
+    <!-- Νέο κουμπί Trade Swap για το Raydium -->
+    <button class="menu-btn" onclick="window.open('https://raydium.io/swap/?inputMint=sol&outputMint=Bk5K3H', '_blank')" style="background: rgba(52, 152, 219, 0.3); border-color: #3498db;">💱 Trade Swap</button>
+    <button class="menu-btn" onclick="openModal('vipCardModalOverlay')" style="grid-column: span 3; background: rgba(241,196,15,0.2); border-color: #f1c40f;">👑 VIP Pass (0.2 SOL)</button>
   </div>
 
   <!-- Modals -->
@@ -67,7 +69,7 @@
     document.getElementById('scoreDisplay').innerText = score; 
   };
 
-  // ΔΙΟΡΘΩΜΕΝΗ ΣΥΝΑΡΤΗΣΗ ΣΥΝΔΕΣΗΣ (Με Deep Linking για Phantom)
+  // ΣΥΝΑΡΤΗΣΗ ΣΥΝΔΕΣΗΣ (Με Deep Linking για Phantom)
   async function connectWallet() {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
